@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styless.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Add New City Section -->
+        <div class="add-city-section">
+            <h2 class="section-title">Add New City</h2>
+            <div class="add-city-form">
+                <input type="text" class="city-input" placeholder="Enter city name (e.g., London, New York)" id="cityInput">
+                <button class="add-btn" onclick="addCity()">Add City</button>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h2 class="filter-title">Filter Weather Data</h2>
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search cities..." id="searchInput">
+                </div>
+                <select class="filter-select" id="temperatureFilter">
+                    <option value="all">All temperatures</option>
+                    <option value="hot">Hot (>25°C)</option>
+                    <option value="warm">Warm (15-25°C)</option>
+                    <option value="cold">Cold (<15°C)</option>
+                </select>
+                <select class="filter-select" id="weatherFilter">
+                    <option value="all">All weather</option>
+                    <option value="clear">Clear Sky</option>
+                    <option value="clouds">Cloudy</option>
+                    <option value="rain">Rain</option>
+                    <option value="snow">Snow</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="refresh-btn" onclick="refreshAll()">Refresh All</button>
+            <button class="clear-btn" onclick="clearAllCities()">Clear All Cities</button>
+        </div>
+
+        <!-- Weather Cards Grid -->
+        <div class="weather-grid" id="weatherGrid">
+            <!-- Las tarjetas se generarán dinámicamente con JavaScript -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
