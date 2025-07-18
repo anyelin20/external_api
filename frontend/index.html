@@ -69,14 +69,19 @@
     >
         <h2>Ingresar nuevo registro</h2>
         <form id="entradaForm">
-            <label for="titulo">Título:</label><br />
-            <input type="text" id="titulo" name="titulo" required /><br /><br />
+            <label for="nombre_usuario">Nombre del usuario:</label><br />
+            <input type="text" id="nombre_usuario" name="nombre_usuario" required /><br /><br />
+
+            <label for="ciudad">Ciudad:</label><br />
+            <input type="text" id="ciudad" name="ciudad" required /><br /><br />
+
+            <label for="clima">Clima:</label><br />
+            <input type="text" id="clima" name="clima" required /><br /><br />
 
             <label for="descripcion">Descripción:</label><br />
-            <textarea id="descripcion" name="descripcion" required></textarea
-            ><br /><br />
+            <textarea id="descripcion" name="descripcion" required></textarea><br /><br />
 
-            <label for="imagen_url">URL Imagen:</label><br />
+            <label for="imagen_url">URL Imagen (opcional):</label><br />
             <input type="url" id="imagen_url" name="imagen_url" /><br /><br />
 
             <button type="submit">Enviar</button>
@@ -95,7 +100,9 @@
 
                 const form = e.target;
                 const formData = new URLSearchParams();
-                formData.append("titulo", form.titulo.value);
+                formData.append("nombre_usuario", form.nombre_usuario.value);
+                formData.append("ciudad", form.ciudad.value);
+                formData.append("clima", form.clima.value);
                 formData.append("descripcion", form.descripcion.value);
                 formData.append("imagen_url", form.imagen_url.value);
 
@@ -131,3 +138,4 @@
     </script>
 </body>
 </html>
+
