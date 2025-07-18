@@ -8,6 +8,7 @@ import asyncio
 import aiohttp
 
 router = APIRouter()
+
 #Conexion al API
 class WeatherAPI:
     def __init__(self, api_key: str):
@@ -132,6 +133,7 @@ def guardar_clima(entry: WeatherResponse):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
+
 #Obtener clima de la db
 @router.get("/weather")
 def listar_climas():
@@ -145,3 +147,37 @@ def listar_climas():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
+
+# --------------------------
+# NUEVA RUTA: Formulario de ingreso (POST)
+# --------------------------
+from fastapi import Form, Depends
+from sqlalchemy.orm import Session
+from .database import get_db
+from .model import Entrada
+
+@router.post("/entradas")
+def crear_entrada(
+    titulo: str = Form(...),
+    descripcion: str = Form(...),
+    imagen_url: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    nueva_entrada = Entrada(
+        titulo=titulo,
+        descripcion=descripcion,
+        imagen_url=imagen_url
+    )
+    db.add(nueva_entrada)
+    db.commit()
+    db.refresh(nueva_entrada)
+    return {
+        "message": "Entrada creada exitosamente",
+        "entrada": {
+            "id": nueva_entrada.id,
+            "titulo": nueva_entrada.titulo,
+            "descripcion": nueva_entrada.descripcion,
+            "imagen_url": nueva_entrada.imagen_url
+        }
+    }
+
