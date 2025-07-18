@@ -160,7 +160,7 @@ from .model import Entrada
 def crear_entrada(
     titulo: str = Form(...),
     descripcion: str = Form(...),
-    imagen_url: str = Form(...),
+    imagen_url: str = Form(None),  # imagen opcional
     db: Session = Depends(get_db)
 ):
     nueva_entrada = Entrada(
@@ -180,4 +180,3 @@ def crear_entrada(
             "imagen_url": nueva_entrada.imagen_url
         }
     }
-
