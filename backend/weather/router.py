@@ -151,20 +151,26 @@ def listar_climas():
 # --------------------------
 # NUEVA RUTA: Formulario de ingreso (POST)
 # --------------------------
-from fastapi import Form, Depends
+from fastapi import APIRouter, Form, Depends
 from sqlalchemy.orm import Session
 from .database import get_db
 from .model import Entrada
 
+router = APIRouter()
+
 @router.post("/entradas")
 def crear_entrada(
-    titulo: str = Form(...),
+    nombre_usuario: str = Form(...),
+    ciudad: str = Form(...),
+    clima: str = Form(...),
     descripcion: str = Form(...),
-    imagen_url: str = Form(None),  # imagen opcional
+    imagen_url: str = Form(None),
     db: Session = Depends(get_db)
 ):
     nueva_entrada = Entrada(
-        titulo=titulo,
+        nombre_usuario=nombre_usuario,
+        ciudad=ciudad,
+        clima=clima,
         descripcion=descripcion,
         imagen_url=imagen_url
     )
@@ -175,7 +181,9 @@ def crear_entrada(
         "message": "Entrada creada exitosamente",
         "entrada": {
             "id": nueva_entrada.id,
-            "titulo": nueva_entrada.titulo,
+            "nombre_usuario": nueva_entrada.nombre_usuario,
+            "ciudad": nueva_entrada.ciudad,
+            "clima": nueva_entrada.clima,
             "descripcion": nueva_entrada.descripcion,
             "imagen_url": nueva_entrada.imagen_url
         }
