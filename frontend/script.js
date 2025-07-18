@@ -461,3 +461,49 @@ document.addEventListener('DOMContentLoaded', function() {
     // Renderizar inicial (vacío)
     renderWeatherCards();
 });
+
+// Función para manejar el envío del formulario de ingreso de entradas
+document.addEventListener("DOMContentLoaded", () => {
+  const entradaForm = document.getElementById("entradaForm");
+  if (!entradaForm) return; // Si el formulario no existe, salir
+
+  entradaForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new URLSearchParams();
+    formData.append("titulo", entradaForm.titulo.value);
+    formData.append("descripcion", entradaForm.descripcion.value);
+    formData.append("imagen_url", entradaForm.imagen_url.value);
+
+    const respuestaForm = document.getElementById("respuestaForm");
+    respuestaForm.style.color = "green";
+    respuestaForm.textContent = "Enviando...";
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/entradas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        respuestaForm.style.color = "red";
+        respuestaForm.textContent = `Error: ${errorData.detail || "No se pudo crear la entrada"}`;
+        return;
+      }
+
+      const data = await response.json();
+      respuestaForm.style.color = "green";
+      respuestaForm.textContent = `Entrada creada con ID: ${data.entrada.id}`;
+      entradaForm.reset();
+
+    } catch (error) {
+      respuestaForm.style.color = "red";
+      respuestaForm.textContent = `Error de red: ${error.message}`;
+    }
+  });
+});
+
