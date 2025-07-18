@@ -49,7 +49,7 @@ async function addCity() {
 // Función para obtener datos del clima desde la API
 async function getWeatherData(cityName) {
     try {
-        const response = await fetch(`${API_BASE_URL}/weather/${encodeURIComponent(cityName)}`);
+        const response = await fetch(`${API_BASE_URL}/weather_api/${encodeURIComponent(cityName)}`);
         
         if (!response.ok) {
             if (response.status === 404) {
@@ -102,16 +102,13 @@ function getWeatherIcon(iconCode) {
     if (iconCode) {
         return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
     }
-    // Iconos de fallback
     return '☁️';
 }
 
 // Función para obtener emoji del clima
 function getWeatherEmoji(description, iconCode) {
     const desc = description.toLowerCase();
-    
     if (iconCode) {
-        // Mapear códigos de iconos a emojis
         const iconMap = {
             '01d': '☀️', '01n': '🌙',
             '02d': '⛅', '02n': '⛅',
@@ -125,8 +122,6 @@ function getWeatherEmoji(description, iconCode) {
         };
         return iconMap[iconCode] || '☁️';
     }
-    
-    // Fallback basado en descripción
     if (desc.includes('despejado') || desc.includes('clear')) return '☀️';
     if (desc.includes('lluvia') || desc.includes('rain')) return '🌧️';
     if (desc.includes('tormenta') || desc.includes('storm')) return '⛈️';
@@ -141,7 +136,6 @@ function getWeatherClass(description, iconCode) {
         if (iconCode.includes('01') || iconCode.includes('02')) return 'sunny';
         if (iconCode.includes('09') || iconCode.includes('10') || iconCode.includes('11')) return 'rainy';
     }
-    
     const desc = description.toLowerCase();
     if (desc.includes('clear') || desc.includes('despejado')) return 'sunny';
     if (desc.includes('rain') || desc.includes('lluvia') || desc.includes('storm')) return 'rainy';
@@ -151,7 +145,6 @@ function getWeatherClass(description, iconCode) {
 // Función para renderizar las tarjetas del clima
 function renderWeatherCards() {
     const weatherGrid = document.getElementById('weatherGrid');
-    
     if (cities.length === 0) {
         weatherGrid.innerHTML = `
             <div class="empty-state">
@@ -162,8 +155,118 @@ function renderWeatherCards() {
         `;
         return;
     }
-
     weatherGrid.innerHTML = cities.map(city => `
+        <div class="weather-card ${getWeatherClass(city.description, city.icon)}">
+            <div class="weather-header">
+                <div class="city-info">
+                    <span class="city-name">${city.name}</span>
+                    <span class="country-tag">${city.country}</span>
+                </div>
+                <div class="weather-icon-container">
+                    <img src="${getWeatherIcon(city.icon)}" alt="${city.description}" class="weather-icon-img">
+                    <span class="weather-icon-emoji">${getWeatherEmoji(city.description, city.icon)}</span>
+                </div>
+            </div>
+            <div class="temperature-section">
+                <div class="temperature">${city.temperature}°C</div>
+                <div class="temp-range">
+                    <span class="temp-min">${city.tempMin}°</span> / 
+                    <span class="temp-max">${city.tempMax}°</span>
+                </div>
+            </div>
+            <div class="weather-description">${city.description}</div>
+            <div class="feels-like">Feels like ${city.feelsLike}°C</div>
+            <div class="weather-details">
+                <div class="detail-item">
+                    <span class="detail-icon">💧</span>
+                    <span>Humidity: ${city.humidity}%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">💨</span>
+                    <span>Wind: ${city.windSpeed} m/s</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌡️</span>
+                    <span>Pressure: ${city.pressure} hPa</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">👁️</span>
+                    <span>Visibility: ${city.visibility} km</span>
+                </div>
+            </div>
+            <div class="extra-info">
+                <div class="sun-times">
+                    <span class="sunrise">🌅 ${city.sunrise}</span>
+                    <span class="sunset">🌇 ${city.sunset}</span>
+                </div>
+                <div class="last-updated">
+                    <small>Updated: ${city.timestamp}</small>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Función para filtrar ciudades
+function filterCities() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const temperatureFilter = document.getElementById('temperatureFilter').value;
+    const weatherFilter = document.getElementById('weatherFilter').value;
+    
+    let filteredCities = cities;
+
+    // Filtrar por búsqueda
+    if (searchTerm) {
+        filteredCities = filteredCities.filter(city => 
+            city.name.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    // Filtrar por temperatura
+    if (temperatureFilter !== 'all') {
+        filteredCities = filteredCities.filter(city => {
+            const temp = city.temperature;
+            switch (temperatureFilter) {
+                case 'hot': return temp > 25;
+                case 'warm': return temp >= 15 && temp <= 25;
+                case 'cold': return temp < 15;
+                default: return true;
+            }
+        });
+    }
+
+    // Filtrar por clima
+    if (weatherFilter !== 'all') {
+        filteredCities = filteredCities.filter(city => {
+            const desc = city.description.toLowerCase();
+            switch (weatherFilter) {
+                case 'clear': return desc.includes('clear') || desc.includes('despejado');
+                case 'clouds': return desc.includes('cloud') || desc.includes('nube');
+                case 'rain': return desc.includes('rain') || desc.includes('lluvia');
+                case 'snow': return desc.includes('snow') || desc.includes('nieve');
+                default: return true;
+            }
+        });
+    }
+
+    // Renderizar ciudades filtradas
+    renderFilteredCities(filteredCities);
+}
+
+// Función para renderizar ciudades filtradas
+function renderFilteredCities(filteredCities) {
+    const weatherGrid = document.getElementById('weatherGrid');
+    if (filteredCities.length === 0) {
+        weatherGrid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <div class="empty-state-text">No cities match your filters</div>
+                <div class="empty-state-subtext">Try adjusting your search criteria</div>
+            </div>
+        `;
+        return;
+    }
+    weatherGrid.innerHTML = filteredCities.map(city => `
         <div class="weather-card ${getWeatherClass(city.description, city.icon)}">
             <div class="weather-header">
                 <div class="city-info">
@@ -281,12 +384,9 @@ function clearAllCities() {
 
 // Función para mostrar notificaciones
 function showNotification(message, type = 'info') {
-    // Crear elemento de notificación
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
-    
-    // Estilos CSS en línea para la notificación
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -301,27 +401,18 @@ function showNotification(message, type = 'info') {
         transition: all 0.3s ease;
         max-width: 300px;
     `;
-    
-    // Colores según el tipo
     const colors = {
         success: '#10b981',
         error: '#ef4444',
         warning: '#f59e0b',
         info: '#3b82f6'
     };
-    
     notification.style.backgroundColor = colors[type] || colors.info;
-    
-    // Agregar al DOM
     document.body.appendChild(notification);
-    
-    // Mostrar con animación
     setTimeout(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateX(0)';
     }, 100);
-    
-    // Ocultar después de 3 segundos
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100%)';
@@ -331,119 +422,6 @@ function showNotification(message, type = 'info') {
             }
         }, 300);
     }, 3000);
-}
-
-// Función para filtrar ciudades (mantenida igual)
-function filterCities() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const temperatureFilter = document.getElementById('temperatureFilter').value;
-    const weatherFilter = document.getElementById('weatherFilter').value;
-    
-    let filteredCities = cities;
-
-    // Filtrar por búsqueda
-    if (searchTerm) {
-        filteredCities = filteredCities.filter(city => 
-            city.name.toLowerCase().includes(searchTerm)
-        );
-    }
-
-    // Filtrar por temperatura
-    if (temperatureFilter !== 'all') {
-        filteredCities = filteredCities.filter(city => {
-            const temp = city.temperature;
-            switch (temperatureFilter) {
-                case 'hot': return temp > 25;
-                case 'warm': return temp >= 15 && temp <= 25;
-                case 'cold': return temp < 15;
-                default: return true;
-            }
-        });
-    }
-
-    // Filtrar por clima
-    if (weatherFilter !== 'all') {
-        filteredCities = filteredCities.filter(city => {
-            const desc = city.description.toLowerCase();
-            switch (weatherFilter) {
-                case 'clear': return desc.includes('clear') || desc.includes('despejado');
-                case 'clouds': return desc.includes('cloud') || desc.includes('nube');
-                case 'rain': return desc.includes('rain') || desc.includes('lluvia');
-                case 'snow': return desc.includes('snow') || desc.includes('nieve');
-                default: return true;
-            }
-        });
-    }
-
-    // Renderizar ciudades filtradas
-    renderFilteredCities(filteredCities);
-}
-
-// Función para renderizar ciudades filtradas
-function renderFilteredCities(filteredCities) {
-    const weatherGrid = document.getElementById('weatherGrid');
-    
-    if (filteredCities.length === 0) {
-        weatherGrid.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">🔍</div>
-                <div class="empty-state-text">No cities match your filters</div>
-                <div class="empty-state-subtext">Try adjusting your search criteria</div>
-            </div>
-        `;
-        return;
-    }
-
-    weatherGrid.innerHTML = filteredCities.map(city => `
-        <div class="weather-card ${getWeatherClass(city.description, city.icon)}">
-            <div class="weather-header">
-                <div class="city-info">
-                    <span class="city-name">${city.name}</span>
-                    <span class="country-tag">${city.country}</span>
-                </div>
-                <div class="weather-icon-container">
-                    <img src="${getWeatherIcon(city.icon)}" alt="${city.description}" class="weather-icon-img">
-                    <span class="weather-icon-emoji">${getWeatherEmoji(city.description, city.icon)}</span>
-                </div>
-            </div>
-            <div class="temperature-section">
-                <div class="temperature">${city.temperature}°C</div>
-                <div class="temp-range">
-                    <span class="temp-min">${city.tempMin}°</span> / 
-                    <span class="temp-max">${city.tempMax}°</span>
-                </div>
-            </div>
-            <div class="weather-description">${city.description}</div>
-            <div class="feels-like">Feels like ${city.feelsLike}°C</div>
-            <div class="weather-details">
-                <div class="detail-item">
-                    <span class="detail-icon">💧</span>
-                    <span>Humidity: ${city.humidity}%</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-icon">💨</span>
-                    <span>Wind: ${city.windSpeed} m/s</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-icon">🌡️</span>
-                    <span>Pressure: ${city.pressure} hPa</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-icon">👁️</span>
-                    <span>Visibility: ${city.visibility} km</span>
-                </div>
-            </div>
-            <div class="extra-info">
-                <div class="sun-times">
-                    <span class="sunrise">🌅 ${city.sunrise}</span>
-                    <span class="sunset">🌇 ${city.sunset}</span>
-                </div>
-                <div class="last-updated">
-                    <small>Updated: ${city.timestamp}</small>
-                </div>
-            </div>
-        </div>
-    `).join('');
 }
 
 // Función para probar la conectividad con la API
