@@ -465,13 +465,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // Función para manejar el envío del formulario de ingreso de entradas
 document.addEventListener("DOMContentLoaded", () => {
   const entradaForm = document.getElementById("entradaForm");
-  if (!entradaForm) return; // Si el formulario no existe, salir
+  if (!entradaForm) return;
 
   entradaForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new URLSearchParams();
-    formData.append("titulo", entradaForm.titulo.value);
+    formData.append("nombre_usuario", entradaForm.nombre_usuario.value);
+    formData.append("ciudad", entradaForm.ciudad.value);
+    formData.append("clima", entradaForm.clima.value);
     formData.append("descripcion", entradaForm.descripcion.value);
     formData.append("imagen_url", entradaForm.imagen_url.value);
 
@@ -506,4 +508,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
