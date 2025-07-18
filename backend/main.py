@@ -2,7 +2,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from weather import router as weather_router
-from ingreso import router as ingreso_router  # <- NUEVO IMPORTANTE
 
 app = FastAPI(
     title="API del Clima",
@@ -10,17 +9,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS
+# Configuración CORS para permitir solicitudes desde cualquier origen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Cambia esto si quieres restringir orígenes
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
-# Rutas
+# Incluir todas las rutas definidas en weather_router
 app.include_router(weather_router.router)
-app.include_router(ingreso_router.router)  # <- NUEVO PARA EL FORMULARIO
 
-# Uvicorn para ejecutar: uvicorn backend.main:app --reload
+# Para ejecutar:
+# uvicorn backend.main:app --reload
