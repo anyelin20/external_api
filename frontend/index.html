@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Weather App</title>
-    <link rel="stylesheet" href="styless.css">
+    <link rel="stylesheet" href="styless.css" />
 </head>
 <body>
     <div class="container">
@@ -12,7 +12,12 @@
         <div class="add-city-section">
             <h2 class="section-title">Add New City</h2>
             <div class="add-city-form">
-                <input type="text" class="city-input" placeholder="Enter city name (e.g., London, New York)" id="cityInput">
+                <input
+                    type="text"
+                    class="city-input"
+                    placeholder="Enter city name (e.g., London, New York)"
+                    id="cityInput"
+                />
                 <button class="add-btn" onclick="addCity()">Add City</button>
             </div>
         </div>
@@ -22,13 +27,18 @@
             <h2 class="filter-title">Filter Weather Data</h2>
             <div class="filter-controls">
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search cities..." id="searchInput">
+                    <input
+                        type="text"
+                        class="search-input"
+                        placeholder="Search cities..."
+                        id="searchInput"
+                    />
                 </div>
                 <select class="filter-select" id="temperatureFilter">
                     <option value="all">All temperatures</option>
-                    <option value="hot">Hot (>25°C)</option>
+                    <option value="hot">Hot (&gt;25°C)</option>
                     <option value="warm">Warm (15-25°C)</option>
-                    <option value="cold">Cold (<15°C)</option>
+                    <option value="cold">Cold (&lt;15°C)</option>
                 </select>
                 <select class="filter-select" id="weatherFilter">
                     <option value="all">All weather</option>
@@ -52,6 +62,72 @@
         </div>
     </div>
 
+    <!-- FORMULARIO PUNTO 4 - Ingreso de datos -->
+    <div
+        class="form-ingreso-container"
+        style="margin: 20px; padding: 10px; border: 1px solid #ccc;"
+    >
+        <h2>Ingresar nuevo registro</h2>
+        <form id="entradaForm">
+            <label for="titulo">Título:</label><br />
+            <input type="text" id="titulo" name="titulo" required /><br /><br />
+
+            <label for="descripcion">Descripción:</label><br />
+            <textarea id="descripcion" name="descripcion" required></textarea
+            ><br /><br />
+
+            <label for="imagen_url">URL Imagen:</label><br />
+            <input type="url" id="imagen_url" name="imagen_url" /><br /><br />
+
+            <button type="submit">Enviar</button>
+        </form>
+
+        <div id="respuestaForm" style="margin-top: 10px; color: green;"></div>
+    </div>
+
     <script src="script.js"></script>
+
+    <script>
+        document
+            .getElementById("entradaForm")
+            .addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new URLSearchParams();
+                formData.append("titulo", form.titulo.value);
+                formData.append("descripcion", form.descripcion.value);
+                formData.append("imagen_url", form.imagen_url.value);
+
+                try {
+                    const response = await fetch("/entradas", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: formData.toString(),
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        document.getElementById("respuestaForm").style.color = "red";
+                        document.getElementById("respuestaForm").textContent =
+                            "Error: " + (error.detail || "No se pudo crear la entrada");
+                        return;
+                    }
+
+                    const data = await response.json();
+                    document.getElementById("respuestaForm").style.color = "green";
+                    document.getElementById("respuestaForm").textContent =
+                        "Entrada creada con ID: " + data.entrada.id;
+
+                    form.reset();
+                } catch (error) {
+                    document.getElementById("respuestaForm").style.color = "red";
+                    document.getElementById("respuestaForm").textContent =
+                        "Error de red: " + error.message;
+                }
+            });
+    </script>
 </body>
 </html>
