@@ -1,4 +1,7 @@
+from sqlalchemy.ext.declarative import declarative_base
 import pymysql
+
+Base = declarative_base()
 
 def conectar_db():
     return pymysql.connect(
