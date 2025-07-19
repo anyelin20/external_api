@@ -477,12 +477,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("descripcion", entradaForm.descripcion.value);
     formData.append("imagen_url", entradaForm.imagen_url.value);
 
-    const respuestaForm = document.getElementById("respuestaForm");
-    respuestaForm.style.color = "green";
-    respuestaForm.textContent = "Enviando...";
-
     try {
-      const response = await fetch(`${API_BASE_URL}/entradas`, {
+      const response = await fetch(`${API_BASE_URL}/add_entrada`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -491,20 +487,121 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        respuestaForm.style.color = "red";
-        respuestaForm.textContent = `Error: ${errorData.detail || "No se pudo crear la entrada"}`;
-        return;
+        throw new Error("Error al enviar la entrada");
       }
 
-      const data = await response.json();
-      respuestaForm.style.color = "green";
-      respuestaForm.textContent = `Entrada creada con ID: ${data.entrada.id}`;
+      alert("Entrada enviada exitosamente");
       entradaForm.reset();
-
     } catch (error) {
-      respuestaForm.style.color = "red";
-      respuestaForm.textContent = `Error de red: ${error.message}`;
+      alert("Error al enviar la entrada: " + error.message);
     }
   });
 });
+
+// ---------------------------------------------------
+// PUNTO 4 - Mostrar en pestaña nueva la tabla con entradas
+// ---------------------------------------------------
+
+async function openEntriesTab() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/entradas`);
+    if (!response.ok) {
+      throw new Error("Error al obtener las entradas");
+    }
+
+    const entradas = await response.json();
+
+    const newTab = window.open('', '_blank');
+    if (!newTab) {
+      alert("No se pudo abrir la nueva pestaña. Verifica que no esté bloqueada por el navegador.");
+      return;
+    }
+
+    const tableRows = entradas.map((entrada, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${entrada.nombre_usuario}</td>
+        <td>${entrada.ciudad}</td>
+        <td>${entrada.clima}</td>
+        <td>${entrada.descripcion}</td>
+        <td><img src="${entrada.imagen_url}" alt="Imagen" width="80"/></td>
+      </tr>
+    `).join('');
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Listado de Entradas</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: center;
+            }
+            th {
+              background-color: #4CAF50;
+              color: white;
+            }
+            img {
+              border-radius: 6px;
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Entradas del Clima</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Ciudad</th>
+                <th>Clima</th>
+                <th>Descripción</th>
+                <th>Imagen</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    newTab.document.write(htmlContent);
+    newTab.document.close();
+  } catch (error) {
+    showNotification(`❌ No se pudieron cargar las entradas: ${error.message}`, 'error');
+  }
+}
+
+// Crear botón para abrir pestaña con entradas
+document.addEventListener('DOMContentLoaded', function () {
+  const btn = document.createElement('button');
+  btn.textContent = '📄 Ver Entradas';
+  btn.className = 'view-entries-btn';
+  btn.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #3b82f6;
+    color: white;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 999;
+  `;
+  btn.onclick = openEntriesTab;
+  document.body.appendChild(btn);
+});
+
