@@ -160,19 +160,19 @@ router = APIRouter()
 
 @router.post("/entradas")
 def crear_entrada(
-    nombre_usuario: str = Form(...),
+    nombre: str = Form(...),
     ciudad: str = Form(...),
     clima: str = Form(...),
-    descripcion: str = Form(...),
-    imagen_url: str = Form(None),
+    descripcion: str = Form(None),
+    imagen: str = Form(None),
     db: Session = Depends(get_db)
 ):
     nueva_entrada = Entrada(
-        nombre_usuario=nombre_usuario,
+        nombre=nombre,
         ciudad=ciudad,
         clima=clima,
         descripcion=descripcion,
-        imagen_url=imagen_url
+        imagen=imagen
     )
     db.add(nueva_entrada)
     db.commit()
@@ -181,10 +181,10 @@ def crear_entrada(
         "message": "Entrada creada exitosamente",
         "entrada": {
             "id": nueva_entrada.id,
-            "nombre_usuario": nueva_entrada.nombre_usuario,
+            "nombre": nueva_entrada.nombre,
             "ciudad": nueva_entrada.ciudad,
             "clima": nueva_entrada.clima,
             "descripcion": nueva_entrada.descripcion,
-            "imagen_url": nueva_entrada.imagen_url
+            "imagen": nueva_entrada.imagen
         }
     }
