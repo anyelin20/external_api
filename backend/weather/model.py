@@ -1,27 +1,27 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
 from pydantic import BaseModel
 from typing import Dict, Optional
-from backend.weather.database import Base  # necesario para el modelo SQL
+from backend.weather.database import Base  
 
-# Modelo SQL para formulario
+# Modelo SQLAlchemy para la tabla 'formulario'
 class Entrada(Base):
-    __tablename__ = "entradas"
+    __tablename__ = "formulario"
 
     id = Column(Integer, primary_key=True, index=True)
-    nombre_usuario = Column(String(100), nullable=False)
+    nombre = Column(String(100), nullable=False)       
     ciudad = Column(String(100), nullable=False)
-    clima = Column(String(100), nullable=False)
-    descripcion = Column(String(255), nullable=False)
-    imagen_url = Column(String(255), nullable=True)
+    clima = Column(String(50), nullable=False)         
+    descripcion = Column(Text, nullable=True)           
+    imagen = Column(String(255), nullable=True)         
 
 # Modelos Pydantic para validación y documentación
 
 class EntradaCreate(BaseModel):
-    nombre_usuario: str
+    nombre: str
     ciudad: str
     clima: str
-    descripcion: str
-    imagen_url: Optional[str] = None
+    descripcion: Optional[str] = None
+    imagen: Optional[str] = None
 
 class WeatherResponse(BaseModel):
     ciudad: str
@@ -57,5 +57,6 @@ class HealthResponse(BaseModel):
     status: str
     timestamp: str
     message: str
+
 
 
