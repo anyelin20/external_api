@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64) 
 --
 -- Host: localhost    Database: weather_app
 -- ------------------------------------------------------
@@ -49,6 +49,20 @@ CREATE TABLE `weather_data` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `formulario`
+--
+
+CREATE TABLE IF NOT EXISTS `formulario` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(100) NOT NULL,
+  `ciudad` VARCHAR(100) NOT NULL,
+  `clima` VARCHAR(50) NOT NULL,
+  `descripcion` TEXT,
+  `imagen` TEXT,
+  `fecha` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 --
 -- Dumping data for table `weather_data`
