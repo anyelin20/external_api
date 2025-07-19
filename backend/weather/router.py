@@ -1,15 +1,17 @@
 # backend/weather/route.py
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Form, Depends
 from typing import Optional
 from datetime import datetime
-from .model import WeatherResponse, WeatherSimpleResponse, HealthResponse
+from .model import WeatherResponse, WeatherSimpleResponse, HealthResponse, Entrada
 from database import conectar_db
 import asyncio
 import aiohttp
+from sqlalchemy.orm import Session
+from .database import get_db
 
 router = APIRouter()
 
-#Conexion al API
+# Conexion al API
 class WeatherAPI:
     def __init__(self, api_key: str):
         self.api_key = api_key
@@ -67,7 +69,7 @@ async def root():
         "endpoints": ["/weather/{ciudad}", "/health"]
     }
 
-#Info de del clima por ciudad
+# Info de del clima por ciudad
 @router.get("/weather_api/{ciudad}")
 async def get_weather(ciudad: str, format: Optional[str] = "complete", units: Optional[str] = "metric"):
     if units not in ['metric', 'imperial', 'kelvin']:
@@ -92,7 +94,7 @@ async def health():
         message="API funcionando correctamente"
     )
 
-#Guardar info del clima en la DB 
+# Guardar info del clima en la DB 
 @router.post("/weather")
 def guardar_clima(entry: WeatherResponse):
     try:
@@ -134,7 +136,7 @@ def guardar_clima(entry: WeatherResponse):
     finally:
         conn.close()
 
-#Obtener clima de la db
+# Obtener clima de la db
 @router.get("/weather")
 def listar_climas():
     try:
@@ -148,16 +150,7 @@ def listar_climas():
     finally:
         conn.close()
 
-# --------------------------
-# NUEVA RUTA: Formulario de ingreso (POST)
-# --------------------------
-from fastapi import APIRouter, Form, Depends
-from sqlalchemy.orm import Session
-from .database import get_db
-from .model import Entrada
-
-router = APIRouter()
-
+# Ruta para crear entrada de formulario
 @router.post("/entradas")
 def crear_entrada(
     nombre: str = Form(...),
