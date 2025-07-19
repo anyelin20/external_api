@@ -505,3 +505,35 @@ body {
     transform: translateY(-2px);
 }
 
+/* ACCESIBILIDAD: Focus outline para botones */
+.add-btn:focus,
+.refresh-btn:focus,
+.clear-btn:focus,
+.view-entries-btn:focus,
+.form-ingreso-container button[type="submit"]:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Estilos básicos para tabla y sus imágenes (vista en pestaña nueva) */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+table img {
+    max-width: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+}
