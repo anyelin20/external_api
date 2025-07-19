@@ -478,3 +478,30 @@ body {
     text-align: center;
     font-size: 1rem;
 }
+
+/* Botón para ver entradas en nueva pestaña */
+.view-entries-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #3b82f6; /* Azul */
+    color: white;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 9999;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.view-entries-btn:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+
