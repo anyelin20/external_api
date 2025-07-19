@@ -471,14 +471,14 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const formData = new URLSearchParams();
-    formData.append("nombre_usuario", entradaForm.nombre_usuario.value);
+    formData.append("nombre", entradaForm.nombre.value);
     formData.append("ciudad", entradaForm.ciudad.value);
     formData.append("clima", entradaForm.clima.value);
     formData.append("descripcion", entradaForm.descripcion.value);
-    formData.append("imagen_url", entradaForm.imagen_url.value);
+    formData.append("imagen", entradaForm.imagen.value);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/add_entrada`, {
+      const response = await fetch(`${API_BASE_URL}/entradas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -524,7 +524,7 @@ async function openEntriesTab() {
         <td>${entrada.ciudad}</td>
         <td>${entrada.clima}</td>
         <td>${entrada.descripcion}</td>
-        <td><img src="${entrada.imagen_url}" alt="Imagen" width="80"/></td>
+        <td><img src="${entrada.imagen}" alt="Imagen" width="80"/></td>
       </tr>
     `).join('');
 
