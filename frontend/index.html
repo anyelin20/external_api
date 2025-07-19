@@ -102,8 +102,8 @@
       >
         <h2>Ingresar nuevo registro</h2>
         <form id="entradaForm">
-          <label for="nombre_usuario">Nombre del usuario:</label><br />
-          <input type="text" id="nombre_usuario" name="nombre_usuario" required /><br /><br />
+          <label for="nombre">Nombre del usuario:</label><br />
+          <input type="text" id="nombre" name="nombre" required /><br /><br />
 
           <label for="ciudad">Ciudad:</label><br />
           <input type="text" id="ciudad" name="ciudad" required /><br /><br />
@@ -114,8 +114,8 @@
           <label for="descripcion">Descripción:</label><br />
           <textarea id="descripcion" name="descripcion" required></textarea><br /><br />
 
-          <label for="imagen_url">URL Imagen (opcional):</label><br />
-          <input type="url" id="imagen_url" name="imagen_url" /><br /><br />
+          <label for="imagen">URL Imagen (opcional):</label><br />
+          <input type="url" id="imagen" name="imagen" /><br /><br />
 
           <button type="submit">Enviar</button>
         </form>
@@ -144,11 +144,11 @@
 
         const form = e.target;
         const formData = new URLSearchParams();
-        formData.append("nombre_usuario", form.nombre_usuario.value);
+        formData.append("nombre", form.nombre.value);
         formData.append("ciudad", form.ciudad.value);
         formData.append("clima", form.clima.value);
         formData.append("descripcion", form.descripcion.value);
-        formData.append("imagen_url", form.imagen_url.value);
+        formData.append("imagen", form.imagen.value);
 
         try {
           const response = await fetch("/entradas", {
