@@ -520,7 +520,7 @@ async function openEntriesTab() {
     const tableRows = entradas.map((entrada, index) => `
       <tr>
         <td>${index + 1}</td>
-        <td>${entrada.nombre_usuario}</td>
+        <td>${entrada.nombre}</td>
         <td>${entrada.ciudad}</td>
         <td>${entrada.clima}</td>
         <td>${entrada.descripcion}</td>
