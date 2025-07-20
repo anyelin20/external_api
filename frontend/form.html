@@ -1,1 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de ingreso</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .form-ingreso-container {
+      max-width: 500px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #384B70;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #507687;
+    }
+    #respuestaForm {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-ingreso-container">
+    <h2>Ingresar nuevo registro</h2>
+    <form id="entradaForm">
+      <label for="nombre">Nombre del usuario:</label>
+      <input type="text" id="nombre" name="nombre" required />
+
+      <label for="ciudad">Ciudad:</label>
+      <input type="text" id="ciudad" name="ciudad" required />
+
+      <label for="clima">Clima:</label>
+      <input type="text" id="clima" name="clima" required />
+
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" name="descripcion" required></textarea>
+
+      <label for="imagen">URL Imagen (opcional):</label>
+      <input type="url" id="imagen" name="imagen" />
+
+      <button type="submit">Enviar</button>
+    </form>
+
+    <div id="respuestaForm"></div>
+  </div>
+
+  <script>
+    document.getElementById("entradaForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new URLSearchParams();
+      formData.append("nombre", form.nombre.value);
+      formData.append("ciudad", form.ciudad.value);
+      formData.append("clima", form.clima.value);
+      formData.append("descripcion", form.descripcion.value);
+      formData.append("imagen", form.imagen.value);
+
+      try {
+        const response = await fetch("/entradas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: formData.toString(),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          document.getElementById("respuestaForm").style.color = "red";
+          document.getElementById("respuestaForm").textContent =
+            "Error: " + (error.detail || "No se pudo crear la entrada");
+          return;
+        }
+
+        const data = await response.json();
+        document.getElementById("respuestaForm").style.color = "green";
+        document.getElementById("respuestaForm").textContent =
+          "Entrada creada con ID: " + data.entrada.id;
+
+        form.reset();
+      } catch (error) {
+        document.getElementById("respuestaForm").style.color = "red";
+        document.getElementById("respuestaForm").textContent =
+          "Error de red: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
 
