@@ -12,7 +12,8 @@ class Entrada(Base):
     ciudad = Column(String(100), nullable=False)
     clima = Column(String(50), nullable=False)         
     descripcion = Column(Text, nullable=True)           
-    imagen = Column(String(255), nullable=True)         
+    imagen = Column(Text, nullable=True)
+       
 
 # Modelos Pydantic para validación y documentación
 
