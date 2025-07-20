@@ -96,32 +96,10 @@
     </div>
 
     <div id="formTab" class="tab-content">
-      <div
-        class="form-ingreso-container"
-        style="margin: 20px; padding: 10px; border: 1px solid #ccc;"
-      >
-        <h2>Ingresar nuevo registro</h2>
-        <form id="entradaForm">
-          <label for="nombre">Nombre del usuario:</label><br />
-          <input type="text" id="nombre" name="nombre" required /><br /><br />
-
-          <label for="ciudad">Ciudad:</label><br />
-          <input type="text" id="ciudad" name="ciudad" required /><br /><br />
-
-          <label for="clima">Clima:</label><br />
-          <input type="text" id="clima" name="clima" required /><br /><br />
-
-          <label for="descripcion">Descripción:</label><br />
-          <textarea id="descripcion" name="descripcion" required></textarea><br /><br />
-
-          <label for="imagen">URL Imagen (opcional):</label><br />
-          <input type="url" id="imagen" name="imagen" /><br /><br />
-
-          <button type="submit">Enviar</button>
-        </form>
-
-        <div id="respuestaForm" style="margin-top: 10px; color: green;"></div>
-      </div>
+      <!-- Formulario eliminado para usar form.html -->
+      <p style="margin:20px; font-style: italic; color: gray;">
+        El formulario de ingreso está disponible en <code>form.html</code>.
+      </p>
     </div>
   </div>
 
@@ -135,51 +113,6 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
     }
-
-    // Form submission
-    document
-      .getElementById("entradaForm")
-      .addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const form = e.target;
-        const formData = new URLSearchParams();
-        formData.append("nombre", form.nombre.value);
-        formData.append("ciudad", form.ciudad.value);
-        formData.append("clima", form.clima.value);
-        formData.append("descripcion", form.descripcion.value);
-        formData.append("imagen", form.imagen.value);
-
-        try {
-          const response = await fetch("/entradas", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: formData.toString(),
-          });
-
-          if (!response.ok) {
-            const error = await response.json();
-            document.getElementById("respuestaForm").style.color = "red";
-            document.getElementById("respuestaForm").textContent =
-              "Error: " + (error.detail || "No se pudo crear la entrada");
-            return;
-          }
-
-          const data = await response.json();
-          document.getElementById("respuestaForm").style.color = "green";
-          document.getElementById("respuestaForm").textContent =
-            "Entrada creada con ID: " + data.entrada.id;
-
-          form.reset();
-        } catch (error) {
-          document.getElementById("respuestaForm").style.color = "red";
-          document.getElementById("respuestaForm").textContent =
-            "Error de red: " + error.message;
-        }
-      });
   </script>
 </body>
 </html>
-
