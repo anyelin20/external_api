@@ -45,7 +45,7 @@
 <body>
   <div class="form-ingreso-container">
     <h2>Ingresar nuevo registro</h2>
-    <form id="entradaForm">
+    <form id="entradaForm" enctype="multipart/form-data">
       <label for="nombre">Nombre del usuario:</label>
       <input type="text" id="nombre" name="nombre" required />
 
@@ -58,8 +58,8 @@
       <label for="descripcion">Descripción:</label>
       <textarea id="descripcion" name="descripcion" required></textarea>
 
-      <label for="imagen">URL Imagen (opcional):</label>
-      <input type="url" id="imagen" name="imagen" />
+      <label for="imagen">Imagen (archivo opcional):</label>
+      <input type="file" id="imagen" name="imagen" accept="image/*" />
 
       <button type="submit">Enviar</button>
     </form>
@@ -72,20 +72,12 @@
       e.preventDefault();
 
       const form = e.target;
-      const formData = new URLSearchParams();
-      formData.append("nombre", form.nombre.value);
-      formData.append("ciudad", form.ciudad.value);
-      formData.append("clima", form.clima.value);
-      formData.append("descripcion", form.descripcion.value);
-      formData.append("imagen", form.imagen.value);
+      const formData = new FormData(form);  // crea FormData con todo incluido, texto + archivo
 
       try {
         const response = await fetch("/entradas", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formData.toString(),
+          body: formData,  // enviar FormData sin headers manuales
         });
 
         if (!response.ok) {
@@ -111,4 +103,3 @@
   </script>
 </body>
 </html>
-
