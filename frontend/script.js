@@ -529,7 +529,7 @@ async function openEntriesTab() {
         <td>${entrada.ciudad}</td>
         <td>${entrada.clima}</td>
         <td>${entrada.descripcion}</td>
-        <td><img src="${entrada.imagen}" alt="Imagen" width="80"/></td>
+        <td><img src="data:image/png;base64,${entrada.imagen}" alt="Imagen" width="80"/></td>
       </tr>
     `).join('');
 
