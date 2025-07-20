@@ -470,20 +470,25 @@ document.addEventListener("DOMContentLoaded", () => {
   entradaForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = new URLSearchParams();
+    // Cambiado para usar FormData para el archivo imagen
+    const formData = new FormData();
     formData.append("nombre", entradaForm.nombre.value);
     formData.append("ciudad", entradaForm.ciudad.value);
     formData.append("clima", entradaForm.clima.value);
     formData.append("descripcion", entradaForm.descripcion.value);
-    formData.append("imagen", entradaForm.imagen.value);
+
+    // imagen es tipo file, debe ser entradaForm.imagen.files[0]
+    if (entradaForm.imagen.files.length > 0) {
+      formData.append("imagen", entradaForm.imagen.files[0]);
+    } else {
+      // Si no hay archivo seleccionado, puedes decidir qué hacer (opcional)
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/entradas`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
+        // No setear Content-Type, el navegador lo hace automáticamente con FormData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -604,4 +609,5 @@ document.addEventListener('DOMContentLoaded', function () {
   btn.onclick = openEntriesTab;
   document.body.appendChild(btn);
 });
+
 
