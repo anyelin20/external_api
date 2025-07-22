@@ -1,7 +1,7 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from weather import router as weather_router
+from backend.weather import router as weather_router
 
 app = FastAPI(
     title="API del Clima",

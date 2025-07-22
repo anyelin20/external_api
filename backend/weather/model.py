@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text
 from pydantic import BaseModel
 from typing import Dict, Optional
-from backend.weather.database import Base  
+from backend.database import Base  
 
 # Modelo SQLAlchemy para la tabla 'formulario'
 class Entrada(Base):

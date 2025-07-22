@@ -2,11 +2,10 @@ from fastapi import APIRouter, HTTPException, Query, Form, Depends, UploadFile, 
 from typing import Optional
 from datetime import datetime
 from .model import WeatherResponse, WeatherSimpleResponse, HealthResponse, Entrada
-from database import conectar_db
 import asyncio
 import aiohttp
 from sqlalchemy.orm import Session
-from .database import get_db
+from backend.database import conectar_db
 import base64
 
 router = APIRouter()
@@ -155,7 +154,7 @@ async def crear_entrada(
     clima: str = Form(...),
     descripcion: str = Form(None),
     imagen: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(conectar_db)
 ):
     imagen_str = None
     if imagen:
@@ -185,7 +184,7 @@ async def crear_entrada(
     }
 
 @router.get("/entradas")
-def listar_entradas(db: Session = Depends(get_db)):
+def listar_entradas(db: Session = Depends(conectar_db)):
     try:
         return db.query(Entrada).all()
     except Exception as e:
