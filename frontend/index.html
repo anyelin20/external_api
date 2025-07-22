@@ -20,7 +20,8 @@
     <section id="weatherTab" class="tab-content">
       <h2>Consulta del clima</h2>
       <div class="weather-container">
-        <input type="text" id="ciudad" placeholder="Ingrese la ciudad (ej. San Jose,CR)">
+        <!-- Cambié el id aquí para que no choque con el formulario -->
+        <input type="text" id="ciudadConsulta" placeholder="Ingrese la ciudad (ej. San Jose,CR)">
         <button onclick="obtenerClima()">Consultar</button>
         <div id="resultado"></div>
       </div>
@@ -33,8 +34,9 @@
           <label for="nombre">Nombre:</label>
           <input type="text" id="nombre" name="nombre" required><br><br>
 
-          <label for="ciudad">Ciudad:</label>
-          <input type="text" id="ciudad" name="ciudad" required><br><br>
+          <!-- También aquí, id único -->
+          <label for="ciudadForm">Ciudad:</label>
+          <input type="text" id="ciudadForm" name="ciudad" required><br><br>
 
           <label for="clima">Clima:</label>
           <input type="text" id="clima" name="clima" required><br><br>
@@ -65,8 +67,14 @@
     }
 
     async function obtenerClima() {
-      const ciudad = document.getElementById("ciudad").value;
+      const ciudad = document.getElementById("ciudadConsulta").value;
       const resultadoDiv = document.getElementById("resultado");
+
+      if (!ciudad.trim()) {
+        resultadoDiv.innerHTML = "<p style='color:red;'>Por favor ingrese una ciudad.</p>";
+        return;
+      }
+
       resultadoDiv.innerHTML = "Consultando clima...";
 
       try {
@@ -80,10 +88,10 @@
             <p><strong>Clima:</strong> ${data.descripcion}</p>
           `;
         } else {
-          resultadoDiv.innerHTML = `<p>Error: ${data.detail || "Ciudad no encontrada"}</p>`;
+          resultadoDiv.innerHTML = `<p style="color:red;">Error: ${data.detail || "Ciudad no encontrada"}</p>`;
         }
       } catch (error) {
-        resultadoDiv.innerHTML = `<p>Error al consultar el clima.</p>`;
+        resultadoDiv.innerHTML = `<p style="color:red;">Error al consultar el clima.</p>`;
       }
     }
 
@@ -93,7 +101,6 @@
       event.preventDefault();
 
       const formData = new FormData(formulario);
-
       const respuestaDiv = document.getElementById('respuestaForm');
       respuestaDiv.innerHTML = "Enviando datos...";
 
@@ -106,17 +113,21 @@
         const resultado = await response.json();
 
         if (response.ok) {
-          respuestaDiv.innerHTML = `<p style="color:green;">Entrada creada con ID: ${resultado.entrada.id}</p>`;
+          respuestaDiv.style.color = "green";
+          respuestaDiv.innerHTML = `Entrada creada con ID: ${resultado.entrada.id}`;
           formulario.reset();
         } else {
-          respuestaDiv.innerHTML = `<p style="color:red;">Error: ${resultado.detail || "No se pudo enviar"}</p>`;
+          respuestaDiv.style.color = "red";
+          respuestaDiv.innerHTML = `Error: ${resultado.detail || "No se pudo enviar"}`;
         }
       } catch (error) {
-        respuestaDiv.innerHTML = `<p style="color:red;">Error al enviar el formulario.</p>`;
+        respuestaDiv.style.color = "red";
+        respuestaDiv.innerHTML = "Error al enviar el formulario.";
       }
     });
   </script>
 </body>
 </html>
+
 
 
