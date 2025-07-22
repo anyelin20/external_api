@@ -184,3 +184,6 @@ async def crear_entrada(
             "imagen": nueva_entrada.imagen
         }
     }
+@router.get("/entradas")
+def listar_entradas(db: Session = Depends(get_db)):
+    return db.query(Entrada).all()
