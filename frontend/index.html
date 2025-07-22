@@ -29,18 +29,21 @@
     <section id="formTab" class="tab-content" style="display:none;">
       <h2>Formulario de Ingreso</h2>
       <div class="form-ingreso-container">
-        <form id="formulario">
+        <form id="formulario" enctype="multipart/form-data">
           <label for="nombre">Nombre:</label>
           <input type="text" id="nombre" name="nombre" required><br><br>
 
-          <label for="apellido">Apellido:</label>
-          <input type="text" id="apellido" name="apellido" required><br><br>
+          <label for="ciudad">Ciudad:</label>
+          <input type="text" id="ciudad" name="ciudad" required><br><br>
 
-          <label for="pais">País:</label>
-          <input type="text" id="pais" name="pais" required><br><br>
+          <label for="clima">Clima:</label>
+          <input type="text" id="clima" name="clima" required><br><br>
 
-          <label for="comentario">Comentario:</label><br>
-          <textarea id="comentario" name="comentario" rows="4" cols="40" required></textarea><br><br>
+          <label for="descripcion">Descripción:</label><br>
+          <textarea id="descripcion" name="descripcion" rows="4" cols="40" required></textarea><br><br>
+
+          <label for="imagen">Imagen (opcional):</label>
+          <input type="file" id="imagen" name="imagen" accept="image/*"><br><br>
 
           <button type="submit">Enviar</button>
         </form>
@@ -67,14 +70,14 @@
       resultadoDiv.innerHTML = "Consultando clima...";
 
       try {
-        const response = await fetch(`/weather?q=${ciudad}`);
+        const response = await fetch(`http://127.0.0.1:8000/weather_api/${encodeURIComponent(ciudad)}`);
         const data = await response.json();
 
         if (response.ok) {
           resultadoDiv.innerHTML = `
-            <p><strong>Ciudad:</strong> ${data.name}</p>
-            <p><strong>Temperatura:</strong> ${data.main.temp} °C</p>
-            <p><strong>Clima:</strong> ${data.weather[0].description}</p>
+            <p><strong>Ciudad:</strong> ${data.ciudad}</p>
+            <p><strong>Temperatura:</strong> ${data.temperatura} °C</p>
+            <p><strong>Clima:</strong> ${data.descripcion}</p>
           `;
         } else {
           resultadoDiv.innerHTML = `<p>Error: ${data.detail || "Ciudad no encontrada"}</p>`;
@@ -90,22 +93,20 @@
       event.preventDefault();
 
       const formData = new FormData(formulario);
-      const data = Object.fromEntries(formData.entries());
 
       const respuestaDiv = document.getElementById('respuestaForm');
       respuestaDiv.innerHTML = "Enviando datos...";
 
       try {
-        const response = await fetch('/entradas', {
+        const response = await fetch("http://127.0.0.1:8000/entradas", {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: formData
         });
 
         const resultado = await response.json();
 
         if (response.ok) {
-          respuestaDiv.innerHTML = `<p style="color:green;">${resultado.mensaje}</p>`;
+          respuestaDiv.innerHTML = `<p style="color:green;">Entrada creada con ID: ${resultado.entrada.id}</p>`;
           formulario.reset();
         } else {
           respuestaDiv.innerHTML = `<p style="color:red;">Error: ${resultado.detail || "No se pudo enviar"}</p>`;
@@ -117,4 +118,5 @@
   </script>
 </body>
 </html>
+
 
