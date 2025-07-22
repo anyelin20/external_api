@@ -75,7 +75,7 @@
       const formData = new FormData(form);  // crea FormData con todo incluido, texto + archivo
 
       try {
-        const response = await fetch("/entradas", {
+        const response = await fetch("http://127.0.0.1:8000/entradas", {
           method: "POST",
           body: formData,  // enviar FormData sin headers manuales
         });
@@ -103,3 +103,4 @@
   </script>
 </body>
 </html>
+
