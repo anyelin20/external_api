@@ -3,131 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>API del Clima</title>
-  <link rel="stylesheet" href="styless.css"/>
+  <title>Weather App</title>
+  <link rel="stylesheet" href="styless.css">
 </head>
 <body>
-  <header>
-    <h1>API del Clima</h1>
-  </header>
+  <div class="container">
 
-  <nav>
-    <button onclick="mostrarTab('weatherTab')">Consultar Clima</button>
-    <button onclick="mostrarTab('formTab')">Formulario de Ingreso</button>
-  </nav>
+    <!-- Navegación entre pestañas -->
+    <nav class="action-buttons" style="justify-content: flex-end; margin-bottom: 24px;">
+      <button class="refresh-btn" onclick="location.href='index.html'">Consultar Clima</button>
+      <button class="clear-btn" onclick="location.href='form.html'">Formulario de Ingreso</button>
+    </nav>
 
-  <main>
-    <section id="weatherTab" class="tab-content">
-      <h2>Consulta del clima</h2>
-      <div class="weather-container">
-        <!-- Cambié el id aquí para que no choque con el formulario -->
-        <input type="text" id="ciudadConsulta" placeholder="Ingrese la ciudad (ej. San Jose,CR)">
-        <button onclick="obtenerClima()">Consultar</button>
-        <div id="resultado"></div>
+    <!-- Add New City Section -->
+    <div class="add-city-section">
+      <h2 class="section-title">Add New City</h2>
+      <div class="add-city-form">
+        <input type="text" class="city-input" placeholder="Enter city name (e.g., London, New York)" id="cityInput">
+        <button class="add-btn" onclick="addCity()">Add City</button>
       </div>
-    </section>
+    </div>
 
-    <section id="formTab" class="tab-content" style="display:none;">
-      <h2>Formulario de Ingreso</h2>
-      <div class="form-ingreso-container">
-        <form id="formulario" enctype="multipart/form-data">
-          <label for="nombre">Nombre:</label>
-          <input type="text" id="nombre" name="nombre" required><br><br>
-
-          <!-- También aquí, id único -->
-          <label for="ciudadForm">Ciudad:</label>
-          <input type="text" id="ciudadForm" name="ciudad" required><br><br>
-
-          <label for="clima">Clima:</label>
-          <input type="text" id="clima" name="clima" required><br><br>
-
-          <label for="descripcion">Descripción:</label><br>
-          <textarea id="descripcion" name="descripcion" rows="4" cols="40" required></textarea><br><br>
-
-          <label for="imagen">Imagen (opcional):</label>
-          <input type="file" id="imagen" name="imagen" accept="image/*"><br><br>
-
-          <button type="submit">Enviar</button>
-        </form>
-
-        <div id="respuestaForm"></div>
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <h2 class="filter-title">Filter Weather Data</h2>
+      <div class="filter-controls">
+        <div class="search-box">
+          <input type="text" class="search-input" placeholder="Search cities..." id="searchInput">
+        </div>
+        <select class="filter-select" id="temperatureFilter">
+          <option value="all">All temperatures</option>
+          <option value="hot">Hot (&gt;25°C)</option>
+          <option value="warm">Warm (15-25°C)</option>
+          <option value="cold">Cold (&lt;15°C)</option>
+        </select>
+        <select class="filter-select" id="weatherFilter">
+          <option value="all">All weather</option>
+          <option value="clear">Clear Sky</option>
+          <option value="clouds">Cloudy</option>
+          <option value="rain">Rain</option>
+          <option value="snow">Snow</option>
+        </select>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <footer>
-    <p>&copy; 2025 API del Clima</p>
-  </footer>
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="refresh-btn" onclick="refreshAll()">Refresh All</button>
+      <button class="clear-btn" onclick="clearAllCities()">Clear All Cities</button>
+    </div>
 
-  <script>
-    function mostrarTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.style.display = 'none');
-      document.getElementById(tabId).style.display = 'block';
-    }
+    <!-- Weather Cards Grid -->
+    <div class="weather-grid" id="weatherGrid">
+      <!-- Las tarjetas se generarán dinámicamente con JavaScript -->
+    </div>
+    
+  </div>
 
-    async function obtenerClima() {
-      const ciudad = document.getElementById("ciudadConsulta").value;
-      const resultadoDiv = document.getElementById("resultado");
-
-      if (!ciudad.trim()) {
-        resultadoDiv.innerHTML = "<p style='color:red;'>Por favor ingrese una ciudad.</p>";
-        return;
-      }
-
-      resultadoDiv.innerHTML = "Consultando clima...";
-
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/weather_api/${encodeURIComponent(ciudad)}`);
-        const data = await response.json();
-
-        if (response.ok) {
-          resultadoDiv.innerHTML = `
-            <p><strong>Ciudad:</strong> ${data.ciudad}</p>
-            <p><strong>Temperatura:</strong> ${data.temperatura} °C</p>
-            <p><strong>Clima:</strong> ${data.descripcion}</p>
-          `;
-        } else {
-          resultadoDiv.innerHTML = `<p style="color:red;">Error: ${data.detail || "Ciudad no encontrada"}</p>`;
-        }
-      } catch (error) {
-        resultadoDiv.innerHTML = `<p style="color:red;">Error al consultar el clima.</p>`;
-      }
-    }
-
-    // Manejo del formulario (POST a la API)
-    const formulario = document.getElementById('formulario');
-    formulario.addEventListener('submit', async (event) => {
-      event.preventDefault();
-
-      const formData = new FormData(formulario);
-      const respuestaDiv = document.getElementById('respuestaForm');
-      respuestaDiv.innerHTML = "Enviando datos...";
-
-      try {
-        const response = await fetch("http://127.0.0.1:8000/entradas", {
-          method: 'POST',
-          body: formData
-        });
-
-        const resultado = await response.json();
-
-        if (response.ok) {
-          respuestaDiv.style.color = "green";
-          respuestaDiv.innerHTML = `Entrada creada con ID: ${resultado.entrada.id}`;
-          formulario.reset();
-        } else {
-          respuestaDiv.style.color = "red";
-          respuestaDiv.innerHTML = `Error: ${resultado.detail || "No se pudo enviar"}`;
-        }
-      } catch (error) {
-        respuestaDiv.style.color = "red";
-        respuestaDiv.innerHTML = "Error al enviar el formulario.";
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-
 
 
