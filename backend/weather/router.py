@@ -1,4 +1,3 @@
-# backend/weather/route.py
 from fastapi import APIRouter, HTTPException, Query, Form, Depends, UploadFile, File
 from typing import Optional
 from datetime import datetime
@@ -184,6 +183,11 @@ async def crear_entrada(
             "imagen": nueva_entrada.imagen
         }
     }
+
 @router.get("/entradas")
 def listar_entradas(db: Session = Depends(get_db)):
-    return db.query(Entrada).all()
+    try:
+        return db.query(Entrada).all()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
