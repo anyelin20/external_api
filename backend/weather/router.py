@@ -146,42 +146,50 @@ def listar_climas():
     finally:
         conn.close()
 
-# Ruta para crear entrada de formulario con imagen
 @router.post("/entradas")
 async def crear_entrada(
     nombre: str = Form(...),
     ciudad: str = Form(...),
     clima: str = Form(...),
     descripcion: str = Form(None),
-    imagen: UploadFile = File(None),
-    db: Session = Depends(conectar_db)
+    imagen: UploadFile = File(None)
 ):
     imagen_str = None
-    if imagen:
-        contenido = await imagen.read()
-        imagen_str = base64.b64encode(contenido).decode("utf-8")
 
-    nueva_entrada = Entrada(
-        nombre=nombre,
-        ciudad=ciudad,
-        clima=clima,
-        descripcion=descripcion,
-        imagen=imagen_str
-    )
-    db.add(nueva_entrada)
-    db.commit()
-    db.refresh(nueva_entrada)
-    return {
-        "message": "Entrada creada exitosamente",
-        "entrada": {
-            "id": nueva_entrada.id,
-            "nombre": nueva_entrada.nombre,
-            "ciudad": nueva_entrada.ciudad,
-            "clima": nueva_entrada.clima,
-            "descripcion": nueva_entrada.descripcion,
-            "imagen": nueva_entrada.imagen
+    try:
+        if imagen:
+            contenido = await imagen.read()
+            imagen_str = base64.b64encode(contenido).decode("utf-8")
+
+        conn = conectar_db()
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO entradas (nombre, ciudad, clima, descripcion, imagen)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (
+                nombre,
+                ciudad,
+                clima,
+                descripcion,
+                imagen_str
+            ))
+            conn.commit()
+            new_id = cursor.lastrowid  # ✅ Aquí obtienes el ID generado automáticamente
+
+        return {
+            "message": "Entrada creada exitosamente",
+            "entrada": {
+                "id": new_id
+            }
         }
-    }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+
 
 @router.get("/entradas")
 def listar_entradas(db: Session = Depends(conectar_db)):

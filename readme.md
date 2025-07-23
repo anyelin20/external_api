@@ -7,10 +7,10 @@ Este proyecto es una API desarrollada con FastAPI que obtiene información del c
 ## 📁 Estructura del Proyecto
 
 EXTERNAL_API/
+├.venv/ ← el entorno virtual debe crearse aquí
 ├── archivos_db/
 │   └── weather_app_weather_data.sql ← script para crear la base de datos y tabla
 ├── backend/
-│   ├── .venv/ ← el entorno virtual debe crearse aquí
 │   ├── main.py
 │   ├── api.py
 │   ├── weather_api.py
@@ -34,36 +34,31 @@ EXTERNAL_API/
 
 ## 🚀 Configuración del entorno
 
-1. Abre una terminal y navega a la carpeta `backend`:
 
-```bash
-cd backend
-```
-
-2. Crea un entorno virtual:
+1. Crea un entorno virtual:
 
 ```bash
 python -m venv .venv
 ```
 
-3. Activa el entorno virtual:
+2. Activa el entorno virtual:
 
 - En Windows:
 
 ```bash
-.\.venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 - En Mac/Linux:
 
 ```bash
-source .venv/bin/activate
+source .venv/bin/activates
 ```
 
-4. Instala las dependencias desde `requirements.txt` (este archivo estará dentro de `backend/`):
+3. Instala las dependencias desde `requirements.txt` (este archivo estará dentro de `backend/`):
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ---
@@ -77,15 +72,15 @@ pip install -r requirements.txt
 archivos_db/weather_app_weather_data.sql
 ```
 
-Este script creará la base de datos `weather_app` y la tabla `weather_data`.
+Este script creará la base de datos `weather_app` y las tabla `weather_data` y `entradas` .
 
 ---
 
 ## ▶️ Ejecutar el servidor
 
-1. Asegúrate de estar en la carpeta `backend/`
-2. Activa el entorno virtual
-3. Ejecuta el siguiente comando:
+
+1. Activa el entorno virtual
+2. Ejecuta el siguiente comando:
 
 ```bash
 uvicorn backend.main:app --reload

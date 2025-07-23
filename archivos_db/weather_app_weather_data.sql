@@ -64,6 +64,16 @@ CREATE TABLE IF NOT EXISTS `formulario` (
   `fecha` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+CREATE TABLE IF NOT EXISTS `entradas` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    ciudad VARCHAR(100),
+    clima VARCHAR(100),
+    descripcion TEXT,
+    imagen LONGTEXT  
+);
+
 --
 -- Dumping data for table `weather_data`
 --
