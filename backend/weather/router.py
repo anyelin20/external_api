@@ -192,9 +192,16 @@ async def crear_entrada(
 
 
 @router.get("/entradas")
-def listar_entradas(db: Session = Depends(conectar_db)):
+def listar_entradas():
     try:
-        return db.query(Entrada).all()
+        conn = conectar_db()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM entradas")
+            rows = cursor.fetchall()  # Ya es una lista de diccionarios
+        return rows
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
 
