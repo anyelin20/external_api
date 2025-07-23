@@ -7,7 +7,7 @@ Este proyecto es una API desarrollada con FastAPI que obtiene información del c
 ## 📁 Estructura del Proyecto
 
 EXTERNAL_API/
-├.venv/ ← el entorno virtual debe crearse aquí
+├── .venv/ ← el entorno virtual debe crearse aquí
 ├── archivos_db/
 │   └── weather_app_weather_data.sql ← script para crear la base de datos y tabla
 ├── backend/
@@ -15,12 +15,13 @@ EXTERNAL_API/
 │   ├── api.py
 │   ├── weather_api.py
 │   ├── database.py ← conexión a MySQL
-│   ├── requirements.txt ← estará aquí
 │   └── weather/
 │       ├── model.py
-│       ├── router.py
+│       └── router.py
+├── requirements.txt ← estará aquí
 ├── .gitignore
 └── README.md
+
 
 ---
 
