@@ -611,3 +611,113 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// ---------------------------------------------------
+// PUNTO 5 - Mostrar registros de la base de datos en el formulario
+
+window.addEventListener("DOMContentLoaded", fetchEntradas);
+
+// Elementos del DOM
+const ciudadInput = document.getElementById("filterCiudad");
+const climaSelect = document.getElementById("filterClima");
+const origenFiltro = document.getElementById("origenFiltro");  // ← este ID debe coincidir con el <select>
+const registrosContainer = document.getElementById("registrosContainer");
+
+let currentPage = 1;
+const cardsPerPage = 4;
+
+// Estilo en grid para tarjetas si no está ya aplicado
+if (registrosContainer && !registrosContainer.classList.contains("weather-grid-show")) {
+  registrosContainer.classList.add("weather-grid-show");
+}
+
+// Listeners de filtros
+if (ciudadInput && climaSelect && origenFiltro) {
+  ciudadInput.addEventListener("input", () => {
+    currentPage = 1;
+    fetchEntradas();
+  });
+  climaSelect.addEventListener("change", () => {
+    currentPage = 1;
+    fetchEntradas();
+  });
+  origenFiltro.addEventListener("change", () => {
+    currentPage = 1;
+    fetchEntradas();
+  });
+}
+
+async function fetchEntradas() {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/entradas");
+    const data = await res.json();
+
+    const ciudadFiltro = ciudadInput.value.toLowerCase();
+    const climaFiltro = climaSelect.value;
+    const origenSeleccionado = origenFiltro ? origenFiltro.value : "all";
+
+    const filtrados = data.filter(entry => {
+      const ciudadOk = entry.ciudad.toLowerCase().includes(ciudadFiltro);
+      const climaOk = climaFiltro === "all" || entry.clima.toLowerCase() === climaFiltro;
+      const origenOk = origenSeleccionado === "all" || entry.origen === origenSeleccionado;
+      return ciudadOk && climaOk && origenOk;
+    });
+
+    renderEntradas(filtrados);
+  } catch (err) {
+    registrosContainer.innerHTML = "<p>Error al cargar registros</p>";
+  }
+}
+
+function renderEntradas(entradas) {
+  registrosContainer.innerHTML = "";
+
+  if (entradas.length === 0) {
+    registrosContainer.innerHTML = "<p>No hay registros coincidentes</p>";
+    return;
+  }
+
+  const totalPages = Math.ceil(entradas.length / cardsPerPage);
+  const startIndex = (currentPage - 1) * cardsPerPage;
+  const endIndex = startIndex + cardsPerPage;
+  const currentCards = entradas.slice(startIndex, endIndex);
+
+  currentCards.forEach(entry => {
+    const clima = (entry.clima || "").toLowerCase();
+    const climaClass = clima.includes("lluv") ? "rainy" :
+                       clima.includes("nublado") ? "cloudy" : "sunny";
+
+    const card = document.createElement("div");
+    card.className = `weather-card ${climaClass}`;
+    card.innerHTML = `
+      <div class="weather-header">
+        <div class="city-info">
+          <span class="city-name">${entry.nombre}</span>
+          <span class="country-tag">${entry.ciudad}</span>
+        </div>
+      </div>
+      <div class="temperature">${entry.clima}</div>
+      <div class="weather-description">${entry.descripcion || "Sin descripción"}</div>
+      ${entry.imagen ? `<img src="data:image/*;base64,${entry.imagen}" alt="Imagen" class="card-img">` : ""}
+    `;
+    registrosContainer.appendChild(card);
+  });
+
+  // Controles de paginación centrados abajo
+  const paginationDiv = document.createElement("div");
+  paginationDiv.className = "pagination-wrapper";
+  paginationDiv.innerHTML = `
+    <div class="pagination">
+      <button ${currentPage === 1 ? "disabled" : ""} onclick="changePage(-1)">◀ Anterior</button>
+      <span>Página ${currentPage} de ${totalPages}</span>
+      <button ${currentPage === totalPages ? "disabled" : ""} onclick="changePage(1)">Siguiente ▶</button>
+    </div>
+  `;
+  registrosContainer.appendChild(paginationDiv);
+}
+
+// Controlador global para paginación
+window.changePage = function (delta) {
+  currentPage += delta;
+  fetchEntradas();
+};
+
