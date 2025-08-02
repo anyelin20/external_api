@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.weather import router as weather_router
-from pipeline.etl_pipeline import ejecutar_pipeline # n
+
 
 
 app = FastAPI(
@@ -26,13 +26,5 @@ app.include_router(weather_router.router)
 # Para ejecutar:
 # uvicorn backend.main:app --reload
 
-#.................................................
-# Endpoint manual para ejecutar pipeline # n
-@app.post("/api/pipeline/run")
-def correr_pipeline():
-    return ejecutar_pipeline()
 
-#Ejecutar:
-#uvicorn backend.main:app --reload
-#solicitud POST a: http://localhost:8000/api/pipeline/run
 
