@@ -1,84 +1,63 @@
-# pipeline.py
-import pymysql
-import pandas as pd
-from datetime import datetime
 import os
 import json
+from datetime import datetime
+import pandas as pd
+from sqlalchemy.orm import Session
+from backend.database import SessionLocal
+from backend.models import Entrada, EntradaCleaned
 
-def conectar_db():
-    return pymysql.connect(
-        host="127.0.0.1",
-        user="root",
-        password="123Queso",
-        database="weather_app",
-        cursorclass=pymysql.cursors.DictCursor
-    )
+def ejecutar_pipeline():
+    db: Session = SessionLocal()
 
-def extraer_datos():
-    conn = conectar_db()
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM raw_data")
-        rows = cursor.fetchall()
-    return pd.DataFrame(rows)
+    # EXTRAER datos de la tabla RAW (formulario)
+    datos_raw = db.query(Entrada).all()
+    if not datos_raw:
+        return {"mensaje": "No hay datos en la tabla formulario (raw)."}
 
-def transformar(df):
-    original = len(df)
+    df_raw = pd.DataFrame([r.__dict__ for r in datos_raw])
+    df_raw.drop(columns=["_sa_instance_state"], inplace=True)
 
-    df = df.dropna()  # eliminar nulos
-    df['ciudad'] = df['ciudad'].str.title().str.strip()
-    df['nombre'] = df['nombre'].str.title().str.strip()
-    df['clima'] = df['clima'].str.lower().str.strip()
-    df['fecha'] = pd.to_datetime(df['fecha'], errors='coerce')
-    df = df.dropna(subset=['fecha'])  # eliminar fechas inválidas
+    total_leidos = len(df_raw)
 
-    limpiados = original - len(df)
-    return df, limpiados
+    # TRANSFORMAR: eliminar nulos, formatear campos
+    df_clean = df_raw.dropna(subset=["nombre", "ciudad", "clima"])
+    df_clean["nombre"] = df_clean["nombre"].str.strip().str.title()
+    df_clean["ciudad"] = df_clean["ciudad"].str.strip().str.title()
+    df_clean["clima"] = df_clean["clima"].str.strip().str.lower()
 
-def cargar(df):
-    conn = conectar_db()
-    with conn.cursor() as cursor:
-        for _, row in df.iterrows():
-            cursor.execute("""
-                INSERT INTO cleaned_data (nombre, ciudad, clima, descripcion, fecha, imagen_url)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (row['nombre'], row['ciudad'], row['clima'], row['descripcion'], row['fecha'], row['imagen_url']))
-    conn.commit()
+    total_limpiados = total_leidos - len(df_clean)
 
-def backup(df_raw, df_cleaned):
+    # CARGAR: insertar en tabla cleaned_data
+    for _, row in df_clean.iterrows():
+        entrada_limpia = EntradaCleaned(
+            nombre=row["nombre"],
+            ciudad=row["ciudad"],
+            clima=row["clima"],
+            descripcion=row.get("descripcion"),
+            imagen=row.get("imagen")
+        )
+        db.add(entrada_limpia)
+    db.commit()
+
+    # BACKUP + LOG
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    os.makedirs("backups", exist_ok=True)
+    backup_dir = "backups"
+    os.makedirs(backup_dir, exist_ok=True)
 
-    raw_path = f"backups/raw_{timestamp}.csv"
-    clean_path = f"backups/cleaned_{timestamp}.csv"
-    log_path = f"backups/log_{timestamp}.json"
-
-    df_raw.to_csv(raw_path, index=False)
-    df_cleaned.to_csv(clean_path, index=False)
+    df_raw.to_csv(f"{backup_dir}/raw_{timestamp}.csv", index=False)
+    df_clean.to_csv(f"{backup_dir}/cleaned_{timestamp}.csv", index=False)
 
     log = {
         "timestamp": timestamp,
-        "registros_leidos": len(df_raw),
-        "registros_limpiados": len(df_raw) - len(df_cleaned),
-        "csv_raw": raw_path,
-        "csv_cleaned": clean_path
+        "registros_leidos": total_leidos,
+        "registros_limpiados": total_limpiados
     }
 
-    with open(log_path, "w") as f:
+    with open(f"{backup_dir}/log_{timestamp}.json", "w") as f:
         json.dump(log, f, indent=4)
 
-def ejecutar_pipeline():
-    df_raw = extraer_datos()
-    df_clean, eliminados = transformar(df_raw)
-    cargar(df_clean)
-    backup(df_raw, df_clean)
     return {
-        "leidos": len(df_raw),
-        "eliminados": eliminados,
-        "almacenados": len(df_clean)
+        "mensaje": "Pipeline ejecutado correctamente.",
+        "resumen": log
     }
-
-# manualmente:
-if __name__ == "__main__":
-    resultado = ejecutar_pipeline()
-    print(resultado)
 
